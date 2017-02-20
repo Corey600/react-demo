@@ -30,18 +30,27 @@ const DEST_DIR = path.join(SRC_DIR, 'dist');
  */
 function getWebpackConfig(src, dest) {
   const config = {
-    context: src,
-    entry: {},
+    entry: {
+      'public/common/js/common': ['react', 'react-dom'],
+    },
     output: {
       path: dest,
       filename: '[name]-[chunkhash:8].js',
+      // publicPath: '/assets/',
     },
     module: {
-      loaders: [{
-        test: /\.(css|sass)$/,
-        loader: ExtractTextPlugin.extract({
+      rules: [{
+        test: /\.jsx?$/,
+        loader: 'babel-loader',
+        exclude: [path.resolve(src, 'node_modules')],
+        options: {
+          presets: ['es2015', 'react'],
+        },
+      }, {
+        test: /\.s?css$/,
+        use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: '!css-loader?sourceMap!sass-loader?sourceMap',
+          use: ['css-loader', 'sass-loader'],
         }),
       }, {
         test: /\.(ico|png|jpeg|jpg|gif|svg)$/,
@@ -53,12 +62,12 @@ function getWebpackConfig(src, dest) {
       }],
     },
     devtool: 'source-map',
+    context: src,
     plugins: [
       // 将公共代码抽离出来合并为一个文件
       new webpack.optimize.CommonsChunkPlugin({
-        name: 'public/common/common',
-        filename: 'public/common/common-[hash:8].js',
-        minChunks: 2,
+        name: 'public/common/js/common',
+        minChunks: 3,
       }),
       // 将样式抽离出来作为单独的文件
       new ExtractTextPlugin('[name]-[contenthash:8].css'),
@@ -73,11 +82,11 @@ function getWebpackConfig(src, dest) {
     const basename = path.basename(item, '.html');
     const tempname = item.replace(/\.html/, `/${basename}`);
     const chunkname = `public/pages/${tempname}`;
-    entry[chunkname] = `./${chunkname}.js`;
+    entry[chunkname] = `./${chunkname}.jsx`;
     plugins.push(new HtmlWebpackPlugin({
-      filename: (item === 'index.html' ? '' : 'html/') + item,
-      template: path.join(DEST_DIR, item),
-      chunks: ['public/common/common', chunkname],
+      filename: `views/${item}`,
+      template: path.join(SRC_DIR, 'views/pages', item),
+      chunks: ['public/common/js/common', chunkname],
       minify: false,
     }));
   });
@@ -93,6 +102,7 @@ function getWebpackConfig(src, dest) {
  */
 function releaseCallback(err, stats, callback) {
   if (err) throw new gutil.PluginError('webpack', err);
+  // noinspection JSCheckFunctionSignatures
   gutil.log('[webpack]', stats.toString('normal'));
   const jsonStats = stats.toJson();
   const wNum = jsonStats.warnings.length;
