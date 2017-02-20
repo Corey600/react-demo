@@ -9,6 +9,7 @@ const del = require('del');
 const gulp = require('gulp');
 const eslint = require('gulp-eslint');
 const webpack = require('webpack');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const webpackConfig = require('./webpack.config');
 
 // 常量定义
@@ -51,12 +52,20 @@ gulp.task('release', ['clean', 'eslint', 'favicon'], (done) => {
   const config = webpackConfig.getWebpackConfig(SRC_DIR, DEST_DIR);
 
   // js文件的压缩
-  config.plugins.push(new webpack.optimize.UglifyJsPlugin({
+  config.plugins.push(new webpack.DefinePlugin({
+    'process.env': {
+      NODE_ENV: JSON.stringify('production'),
+    },
+  }));
+
+  // js文件的压缩
+  config.plugins.push(new UglifyJSPlugin({
     compress: {
       warnings: false,
     },
     mangle: {
-      except: ['$', 'm', 'window', 'webpackJsonpCallback'],
+      except: ['$super', '$', 'exports', 'require', 'window',
+        'webpack', 'webpackJsonpCallback'],
     },
   }));
 
@@ -72,7 +81,7 @@ gulp.task('release', ['clean', 'eslint', 'favicon'], (done) => {
  * webpack debug 打包
  * @type {task}
  */
-gulp.task('debug', ['clean'/* , 'eslint'*/, 'favicon'], (done) => {
+gulp.task('debug', ['clean', 'eslint', 'favicon'], (done) => {
   const config = webpackConfig.getWebpackConfig(SRC_DIR, DEST_DIR);
 
   // 开启监听

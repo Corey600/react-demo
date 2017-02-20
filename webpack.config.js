@@ -77,7 +77,7 @@ function getWebpackConfig(src, dest) {
   // 配置页面生成和入口脚本文件
   const entry = config.entry;
   const plugins = config.plugins;
-  const htmlfiles = glob.sync('**/*.html', { cwd: path.join(src, 'views', 'pages') });
+  const htmlfiles = glob.sync('**/*.html', { cwd: path.join(src, 'views') });
   htmlfiles.forEach((item) => {
     const basename = path.basename(item, '.html');
     const tempname = item.replace(/\.html/, `/${basename}`);
@@ -85,7 +85,7 @@ function getWebpackConfig(src, dest) {
     entry[chunkname] = `./${chunkname}.jsx`;
     plugins.push(new HtmlWebpackPlugin({
       filename: `views/${item}`,
-      template: path.join(SRC_DIR, 'views/pages', item),
+      template: path.join(SRC_DIR, 'views', item),
       chunks: ['public/common/js/common', chunkname],
       minify: false,
     }));

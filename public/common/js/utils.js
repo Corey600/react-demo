@@ -1,9 +1,10 @@
 
 class Utils {
   constructor() {
+    this.msg = 'Hello!';
   }
   output() {
-    return 'Hello!'
+    return this.msg;
   }
 }
 
