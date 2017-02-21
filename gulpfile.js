@@ -51,7 +51,7 @@ gulp.task('favicon', ['clean'], () => gulp.src([
 gulp.task('release', ['clean', 'eslint', 'favicon'], (done) => {
   const config = webpackConfig.getWebpackConfig(SRC_DIR, DEST_DIR);
 
-  // js文件的压缩
+  // 生产环境
   config.plugins.push(new webpack.DefinePlugin({
     'process.env': {
       NODE_ENV: JSON.stringify('production'),

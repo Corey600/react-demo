@@ -50,7 +50,7 @@ function getWebpackConfig(src, dest) {
         test: /\.s?css$/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: ['css-loader', 'sass-loader'],
+          use: ['css-loader?sourceMap', 'sass-loader?sourceMap'],
         }),
       }, {
         test: /\.(ico|png|jpeg|jpg|gif|svg)$/,
