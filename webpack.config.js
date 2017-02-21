@@ -61,6 +61,9 @@ function getWebpackConfig(src, dest) {
         },
       }],
     },
+    resolve: {
+      extensions: ['.js', '.json', '.jsx', '.css', 'scss'],
+    },
     devtool: 'source-map',
     context: src,
     plugins: [
